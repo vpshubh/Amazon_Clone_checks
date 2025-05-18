@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} | Amazon Clone{% endblock %}
+
+{% block content %}
+<div class="product-detail-container">
+    <div class="product-detail">
+        <div class="product-images">
+            <div class="main-image">
+                <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
+            </div>
+            <div class="image-thumbnails">
+                {% for image in product.images.all %}
+                <img src="{{ image.image.url }}" alt="{{ product.name }} - Image {{ forloop.counter }}"
+                    class="thumbnail">
+                {% endfor %}
+            </div>
+        </div>
+        <div class="product-info">
+            <h1>{{ product.name }}</h1>
+            <div class="product-rating">
+                <div class="stars">
+                    {% for i in "12345" %}
+                    {% if forloop.counter <= product.rating_integer %} <i class="fas fa-star"></i>
+                        {% elif forloop.counter == product.rating_integer_plus_one and product.has_half_star %}
+                        <i class="fas fa-star-half-alt"></i>
+                        {% else %}
+                        <i class="far fa-star"></i>
+                        {% endif %}
+                        {% endfor %}
+                </div>
+                <span class="rating-count">{{ product.rating }} ({{ product.review_count }} ratings)</span>
+            </div>
+            <div class="product-price">
+                {% if product.is_on_sale %}
+                <span class="original-price">${{ product.regular_price }}</span>
+                <span class="sale-price">${{ product.sale_price }}</span>
+                {% else %}
+                <span class="regular-price">${{ product.price }}</span>
+                {% endif %}
+            </div>
+            <div class="product-availability">
+                {% if product.in_stock %}
+                <span class="in-stock">In Stock</span>
+                {% else %}
+                <span class="out-of-stock">Out of Stock</span>
+                {% endif %}
+            </div>
+            <div class="product-description">
+                <h3>About this item</h3>
+                {{ product.description|linebreaks }}
+            </div>
+            <div class="product-actions">
+                <div class="quantity-selector">
+                    <label for="quantity">Quantity:</label>
+                    <select id="quantity" name="quantity">
+                        {% for i in "123456789" %}
+                        <option value="{{ forloop.counter }}">{{ forloop.counter }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button class="add-to-cart-btn" data-product-id="{{ product.id }}"
+                    data-product-name="{{ product.name }}" data-product-price="{{ product.current_price }}">Add to
+                    Cart</button>
+                <button class="buy-now-btn">Buy Now</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-details-tabs">
+        <div class="tabs">
+            <button class="tab-button active" data-tab="description">Description</button>
+            <button class="tab-button" data-tab="specifications">Specifications</button>
+            <button class="tab-button" data-tab="reviews">Customer Reviews</button>
+        </div>
+        <div class="tab-content">
+            <div id="description" class="tab-pane active">
+                {{ product.full_description|linebreaks }}
+            </div>
+            <div id="specifications" class="tab-pane">
+                <table class="specifications-table">
+                    {% for spec in product.specifications.all %}
+                    <tr>
+                        <td class="spec-name">{{ spec.name }}</td>
+                        <td class="spec-value">{{ spec.value }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            <div id="reviews" class="tab-pane">
+                <h3>Customer Reviews</h3>
+                <div class="overall-rating">
+                    <div class="big-rating">{{ product.rating }}</div>
+                    <div class="rating-stars">
+                        {% for i in "12345" %}
+                        {% if forloop.counter <= product.rating_integer %} <i class="fas fa-star"></i>
+                            {% elif forloop.counter == product.rating_integer_plus_one and product.has_half_star %}
+                            <i class="fas fa-star-half-alt"></i>
+                            {% else %}
+                            <i class="far fa-star"></i>
+                            {% endif %}
+                            {% endfor %}
+                    </div>
+                    <div class="rating-count">Based on {{ product.review_count }} reviews</div>
+                </div>
+                <div class="reviews-list">
+                    {% for review in product.reviews.all %}
+                    <div class="review">
+                        <div class="review-header">
+                            <div class="reviewer-name">{{ review.user.username }}</div>
+                            <div class="review-rating">
+                                {% for i in "12345" %}
+                                {% if forloop.counter <= review.rating %} <i class="fas fa-star"></i>
+                                    {% else %}
+                                    <i class="far fa-star"></i>
+                                    {% endif %}
+                                    {% endfor %}
+                            </div>
+                            <div class="review-date">{{ review.created_at|date:"F d, Y" }}</div>
+                        </div>
+                        <div class="review-title">{{ review.title }}</div>
+                        <div class="review-content">{{ review.content }}</div>
+                    </div>
+                    {% empty %}
+                    <p>No reviews yet. Be the first to review this product!</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="related-products">
+        <h2>You may also like</h2>
+        <div class="product-slider">
+            {% for related_product in related_products %}
+            <div class="product-card">
+                <img src="{{ related_product.main_image.url }}" alt="{{ related_product.name }}">
+                <h3>{{ related_product.name }}</h3>
+                <div class="rating">
+                    {% for i in "12345" %}
+                    {% if forloop.counter <= related_product.rating_integer %} <i class="fas fa-star"></i>
+                        {% elif forloop.counter == related_product.rating_integer_plus_one and
+                        related_product.has_half_star %}
+                        <i class="fas fa-star-half-alt"></i>
+                        {% else %}
+                        <i class="far fa-star"></i>
+                        {% endif %}
+                        {% endfor %}
+                        <span>({{ related_product.rating }})</span>
+                </div>
+                <p class="price">${{ related_product.current_price }}</p>
+                <a href="{% url 'store:product_detail' related_product.id %}" class="view-product-btn">View Product</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Tab functionality
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const tabId = this.getAttribute('data-tab');
+
+                // Remove active class from all buttons and panes
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabPanes.forEach(pane => pane.classList.remove('active'));
+
+                // Add active class to current button and pane
+                this.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // Image thumbnail functionality
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        const mainImage = document.querySelector('.main-image img');
+
+        thumbnails.forEach(thumbnail => {
+            thumbnail.addEventListener('click', function () {
+                mainImage.src = this.src;
+                thumbnails.forEach(thumb => thumb.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    });
+</script>
+{% endblock %}

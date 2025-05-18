@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Shopping Cart | Amazon Clone{% endblock %}
+
+{% block content %}
+<div class="cart-container">
+    <div class="cart-header">
+        <h1>Shopping Cart</h1>
+    </div>
+
+    <div class="cart-content">
+        <div class="cart-items">
+            {% if cart_items %}
+            {% for item in cart_items %}
+            <div class="cart-item">
+                <div class="item-image">
+                    <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}">
+                </div>
+                <div class="item-details">
+                    <h3>{{ item.product.name }}</h3>
+                    <p class="item-price">${{ item.product.current_price }}</p>
+                    <p class="item-availability">
+                        {% if item.product.in_stock %}
+                        <span class="in-stock">In Stock</span>
+                        {% else %}
+                        <span class="out-of-stock">Out of Stock</span>
+                        {% endif %}
+                    </p>
+                    <div class="item-actions">
+                        <div class="quantity-selector">
+                            <label for="quantity-{{ item.id }}">Qty:</label>
+                            <select id="quantity-{{ item.id }}" class="item-quantity" data-item-id="{{ item.id }}">
+                                {% for i in "123456789" %}
+                                <option value="{{ forloop.counter }}" {% if forloop.counter==item.quantity %}selected{%
+                                    endif %}>{{ forloop.counter }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="action-buttons">
+                            <button class="save-for-later-btn" data-item-id="{{ item.id }}">Save for later</button>
+                            <button class="delete-item-btn" data-item-id="{{ item.id }}">Delete</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="item-subtotal">
+                    <p>${{ item.subtotal }}</p>
+                </div>
+            </div>
+            {% endfor %}
+            <div class="cart-subtotal">
+                <p>Subtotal ({{ cart_items|length }} items): <span>${{ cart_subtotal }}</span></p>
+            </div>
+            {% else %}
+            <div class="empty-cart">
+                <img src="{{ STATIC_URL }}images/empty_cart.png" alt="Empty Cart">
+                <h2>Your Amazon Cart is empty</h2>
+                <p>Shop today's deals</p>
+                <a href="{% url 'store:home' %}" class="continue-shopping-btn">Continue Shopping</a>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if cart_items %}
+        <div class="cart-summary">
+            <div class="summary-box">
+                <div class="subtotal">
+                    <p>Subtotal ({{ cart_items|length }} items): <span>${{ cart_subtotal }}</span></p>
+                </div>
+                <div class="shipping">
+                    <div class="free-shipping">
+                        <input type="checkbox" id="free-shipping" checked>
+                        <label for="free-shipping">Eligible for FREE Shipping</label>
+                    </div>
+                </div>
+                <div class="proceed-to-checkout">
+                    <button class="checkout-btn">Proceed to checkout</button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="saved-for-later">
+        <h2>Saved for later ({{ saved_items|length }})</h2>
+        <div class="saved-items">
+            {% for item in saved_items %}
+            <div class="saved-item">
+                <div class="item-image">
+                    <img src="{{ item.product.main_image.url }}" alt="{{ item.product.name }}">
+                </div>
+                <div class="item-details">
+                    <h3>{{ item.product.name }}</h3>
+                    <p class="item-price">${{ item.product.current_price }}</p>
+                    <p class="item-availability">
+                        {% if item.product.in_stock %}
+                        <span class="in-stock">In Stock</span>
+                        {% else %}
+                        <span class="out-of-stock">Out of Stock</span>
+                        {% endif %}
+                    </p>
+                    <div class="item-actions">
+                        <button class="move-to-cart-btn" data-item-id="{{ item.id }}">Move to cart</button>
+                        <button class="delete-saved-item-btn" data-item-id="{{ item.id }}">Delete</button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="recommended-products">
+        <h2>Recommended based on your shopping trends</h2>
+        <div class="product-slider">
+            {% for product in recommended_products %}
+            <div class="product-card">
+                <img src="{{ product.main_image.url }}" alt="{{ product.name }}">
+                <h3>{{ product.name }}</h3>
+                <div class="rating">
+                    {% for i in "12345" %}
+                    {% if forloop.counter <= product.rating_integer %} <i class="fas fa-star"></i>
+                        {% elif forloop.counter == product.rating_integer_plus_one and product.has_half_star %}
+                        <i class="fas fa-star-half-alt"></i>
+                        {% else %}
+                        <i class="far fa-star"></i>
+                        {% endif %}
+                        {% endfor %}
+                        <span>({{ product.rating }})</span>
+                </div>
+                <p class="price">${{ product.current_price }}</p>
+                <button class="add-to-cart-btn" data-product-id="{{ product.id }}"
+                    data-product-name="{{ product.name }}" data-product-price="{{ product.current_price }}">Add to
+                    Cart</button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Handle quantity change
+        const quantitySelectors = document.querySelectorAll('.item-quantity');
+        quantitySelectors.forEach(selector => {
+            selector.addEventListener('change', function () {
+                const itemId = this.getAttribute('data-item-id');
+                const quantity = this.value;
+                // Send AJAX request to update quantity
+                updateItemQuantity(itemId, quantity);
+            });
+        });
+
+        // Handle delete item
+        const deleteButtons = document.querySelectorAll('.delete-item-btn');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const itemId = this.getAttribute('data-item-id');
+                // Send AJAX request to delete item
+                deleteCartItem(itemId);
+            });
+        });
+
+        // Handle save for later
+        const saveForLaterButtons = document.querySelectorAll('.save-for-later-btn');
+        saveForLaterButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const itemId = this.getAttribute('data-item-id');
+                // Send AJAX request to save for later
+                saveForLater(itemId);
+            });
+        });
+
+        // Handle move to cart
+        const moveToCartButtons = document.querySelectorAll('.move-to-cart-btn');
+        moveToCartButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const itemId = this.getAttribute('data-item-id');
+                // Send AJAX request to move to cart
+                moveToCart(itemId);
+            });
+        });
+
+        // Handle delete saved item
+        const deleteSavedButtons = document.querySelectorAll('.delete-saved-item-btn');
+        deleteSavedButtons.forEach(button => {
+            button.addEventListener('click', function () {
+                const itemId = this.getAttribute('data-item-id');
+                // Send AJAX request to delete saved item
+                deleteSavedItem(itemId);
+            });
+        });
+
+        // Functions to handle AJAX requests
+        function updateItemQuantity(itemId, quantity) {
+            // AJAX implementation
+            console.log(`Update item ${itemId} to quantity ${quantity}`);
+        }
+
+        function deleteCartItem(itemId) {
+            // AJAX implementation
+            console.log(`Delete item ${itemId} from cart`);
+        }
+
+        function saveForLater(itemId) {
+            // AJAX implementation
+            console.log(`Save item ${itemId} for later`);
+        }
+
+        function moveToCart(itemId) {
+            // AJAX implementation
+            console.log(`Move item ${itemId} to cart`);
+        }
+
+        function deleteSavedItem(itemId) {
+            // AJAX implementation
+            console.log(`Delete saved item ${itemId}`);
+        }
+    });
+</script>
+{% endblock %}

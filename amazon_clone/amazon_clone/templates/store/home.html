@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <div class="hero-content">
+        <h2>Welcome to Amazon Clone</h2>
+        <p>Discover amazing products at great prices</p>
+        <a href="#featured-products" class="hero-button">Shop Now</a>
+    </div>
+</div>
+
+<div class="main-content">
+    <div class="boxes-container">
+        <div class="box">
+            <div class="box-content">
+                <h2>Electronics</h2>
+                <img src="{{ STATIC_URL }}images/box1_image.jpg" alt="Electronics">
+                <p class="add-to-cart" data-product="Electronics">Add to Cart</p>
+            </div>
+        </div>
+        <div class="box">
+            <div class="box-content">
+                <h2>Fashion</h2>
+                <img src="{{ STATIC_URL }}images/box2_image.jpg" alt="Fashion">
+                <p class="add-to-cart" data-product="Fashion">Add to Cart</p>
+            </div>
+        </div>
+        <div class="box">
+            <div class="box-content">
+                <h2>Home & Kitchen</h2>
+                <img src="{{ STATIC_URL }}images/box3_image.jpg" alt="Home & Kitchen">
+                <p class="add-to-cart" data-product="Home & Kitchen">Add to Cart</p>
+            </div>
+        </div>
+        <div class="box">
+            <div class="box-content">
+                <h2>Books</h2>
+                <img src="{{ STATIC_URL }}images/box4_image.jpg" alt="Books">
+                <p class="add-to-cart" data-product="Books">Add to Cart</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="featured-products" class="featured-products">
+        <h2>Featured Products</h2>
+        <div class="product-slider">
+            <!-- Product cards would be dynamically generated here -->
+            <div class="product-card">
+                <img src="{{ STATIC_URL }}images/product1.jpg" alt="Product 1">
+                <h3>Wireless Earbuds</h3>
+                <div class="rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star-half-alt"></i>
+                    <span>(4.5)</span>
+                </div>
+                <p class="price">$49.99</p>
+                <button class="add-to-cart-btn" data-product="Wireless Earbuds" data-price="49.99">Add to Cart</button>
+            </div>
+            <div class="product-card">
+                <img src="{{ STATIC_URL }}images/product2.jpg" alt="Product 2">
+                <h3>Smart Watch</h3>
+                <div class="rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="far fa-star"></i>
+                    <span>(4.0)</span>
+                </div>
+                <p class="price">$89.99</p>
+                <button class="add-to-cart-btn" data-product="Smart Watch" data-price="89.99">Add to Cart</button>
+            </div>
+            <div class="product-card">
+                <img src="{{ STATIC_URL }}images/product3.jpg" alt="Product 3">
+                <h3>Bluetooth Speaker</h3>
+                <div class="rating">
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <i class="fas fa-star"></i>
+                    <span>(5.0)</span>
+                </div>
+                <p class="price">$69.99</p>
+                <button class="add-to-cart-btn" data-product="Bluetooth Speaker" data-price="69.99">Add to Cart</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="deals-section">
+        <h2>Today's Deals</h2>
+        <div class="deals-container">
+            <div class="deal-card">
+                <div class="discount-badge">25% OFF</div>
+                <img src="{{ STATIC_URL }}images/deal1.jpg" alt="Deal 1">
+                <h3>Laptop Stand</h3>
+                <p class="original-price">$39.99</p>
+                <p class="deal-price">$29.99</p>
+                <button class="add-to-cart-btn" data-product="Laptop Stand" data-price="29.99">Add to Cart</button>
+            </div>
+            <div class="deal-card">
+                <div class="discount-badge">30% OFF</div>
+                <img src="{{ STATIC_URL }}images/deal2.jpg" alt="Deal 2">
+                <h3>Wireless Mouse</h3>
+                <p class="original-price">$24.99</p>
+                <p class="deal-price">$17.49</p>
+                <button class="add-to-cart-btn" data-product="Wireless Mouse" data-price="17.49">Add to Cart</button>
+            </div>
+            <div class="deal-card">
+                <div class="discount-badge">15% OFF</div>
+                <img src="{{ STATIC_URL }}images/deal3.jpg" alt="Deal 3">
+                <h3>Phone Case</h3>
+                <p class="original-price">$19.99</p>
+                <p class="deal-price">$16.99</p>
+                <button class="add-to-cart-btn" data-product="Phone Case" data-price="16.99">Add to Cart</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
